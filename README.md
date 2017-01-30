@@ -1,2 +1,2 @@
 # hibernate-driver
-Support of Hibernate in EXASOL
+Support of [Hibernate](https://en.wikipedia.org/wiki/Hibernate_(framework)) in EXASOL
