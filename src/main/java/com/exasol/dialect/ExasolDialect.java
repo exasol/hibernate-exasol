@@ -13,6 +13,10 @@ import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.dialect.function.VarArgsSQLFunction;
 import org.hibernate.dialect.identity.IdentityColumnSupport;
+import org.hibernate.dialect.pagination.AbstractLimitHandler;
+import org.hibernate.dialect.pagination.LimitHandler;
+import org.hibernate.dialect.pagination.LimitHelper;
+import org.hibernate.engine.spi.RowSelection;
 import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.exception.spi.SQLExceptionConversionDelegate;
 import org.hibernate.exception.spi.TemplatedViolatedConstraintNameExtracter;
@@ -27,6 +31,26 @@ import org.hibernate.type.StandardBasicTypes;
  *
  */
 public class ExasolDialect extends Dialect {
+
+    private static final LimitHandler LIMIT_HANDLER = new AbstractLimitHandler() {
+        public String processSql(String sql, RowSelection selection) {
+
+            if (LimitHelper.hasFirstRow(selection)) {
+                sql = sql + " limit " + selection.getFirstRow() + ", " + this.getMaxOrLimit(selection);
+            } else if (LimitHelper.hasMaxRows(selection)) {
+                sql = sql + " limit " + this.getMaxOrLimit(selection);
+            }
+            return sql;
+        }
+
+        public boolean supportsLimit() {
+            return true;
+        }
+
+        public boolean supportsVariableLimit() {
+            return false;
+        }
+    };
 
 	public ExasolDialect() {
 		super();
@@ -939,20 +963,12 @@ public class ExasolDialect extends Dialect {
     @Override
 	public boolean supportsSequences() {
 		return false;
-	}  
-
-    @Override
-	public boolean supportsLimit() {
-		return true;
 	}
 
     @Override
-	public String getLimitString(String sql, boolean hasOffset) {
-		return new StringBuilder( sql.length()+20 )
-				.append( sql )
-				.append( hasOffset ? " limit ? offset ?" : " limit ?" )
-				.toString();
-	}
+    public LimitHandler getLimitHandler() {
+        return LIMIT_HANDLER;
+    }
 
     @Override
 	public boolean bindLimitParametersInReverseOrder() {
