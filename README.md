@@ -2,6 +2,10 @@
 
 EXASOL is a high-performance, in-memory, MPP database specifically designed for analytics. This repository contains a custom dialect to support ORM via JPA and Hibernate 5 using the EXASOL database.
 
+## Deprecation Warning
+
+⚠ This project is no longer maintained. The repository has been archived.
+
 ## Disclaimer
 
 ###### Please note that this is an open source project which is not officially supported by EXASOL. We will try to help you as much as possible, but can't guarantee anything since this is not an official EXASOL product.
